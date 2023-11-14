@@ -1,6 +1,7 @@
 mod cave;
 mod cave_scene;
 mod title_scene;
+mod ui;
 
 use neo_granseal::prelude::*;
 pub use crate::cave::{SceneHandler, TILE_WIDTH};
