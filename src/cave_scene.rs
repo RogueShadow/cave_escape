@@ -5,7 +5,6 @@ use neo_granseal::prelude::*;
 use neo_granseal::util::{LineSegment, PathBuilder, raycast};
 use crate::cave::{ CaveEvent, CaveObject, Player, SCREEN, TileType};
 use crate::TILE_WIDTH;
-use crate::ui::*;
 
 pub struct Cave {
     cam: Camera,
@@ -17,7 +16,6 @@ pub struct Cave {
     font: Font,
     images: HashMap<String,Image>,
     colors: HashMap<&'static str,Ani<Color>>,
-    ui: UiThing,
 }
 impl Default for Cave {
     fn default() -> Self {
@@ -31,13 +29,11 @@ impl Default for Cave {
             font: Font::new(64f32),
             images: HashMap::new(),
             colors: HashMap::new(),
-            ui: UiThing::default(),
         }
     }
 }
 impl NeoGransealEventHandler for Cave {
     fn event(&mut self, core: &mut NGCore, event: Event) {
-        self.ui.event(core,&event);
         match event {
             Event::KeyEvent {state,key} => {
                 if state == KeyState::Pressed && key == Key::F1 {
@@ -98,14 +94,13 @@ impl NeoGransealEventHandler for Cave {
                         self.player.gold,
                         self.player.pos.x.floor() as i32 / TILE_WIDTH,
                         self.player.pos.y.floor() as i32 / TILE_WIDTH,
-                    ).as_str()
+                    ).as_str(),1f32
                 );
                 g.set_tint(Color::ORANGE);
                 g.draw_mesh(&status,vec2(16,16f32 + status.max_y()));
                 g.set_tint(Color::WHITE);
 
 
-                self.ui.draw(&mut mb);
                 g.draw_mesh(&mb.build(), Vec2::ZERO);
 
             }
@@ -258,20 +253,6 @@ impl NeoGransealEventHandler for Cave {
                 self.meshes.insert("debug", debug);
                 self.objects = map.objects;
                 self.meshes.insert("light", raycast_for_light(&(self.player.pos + vec2(TILE_WIDTH,TILE_WIDTH) / 2f32),&self.collision));
-                self.ui.build(&Ui::Frame {
-                    name: "Root Frame".to_string(),
-                    position: vec2(100,100),
-                    size: vec2(128,128),
-                    children: vec![
-                        Ui::Label {
-                            name: "Root Label".to_string(),
-                            position: vec2(10,10),
-                            size: vec2(32,32),
-                            text: "Hello World".to_string(),
-                            children: vec![],
-                        }
-                    ],
-                });
             }
             _ => {}
         }

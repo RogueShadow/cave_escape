@@ -1,10 +1,8 @@
 #![warn(clippy::pedantic)]
 
-use std::collections::HashMap;
+use std::process::exit;
 use std::time::{Duration, Instant};
-use neo_granseal::mesh::{fill_path_fan};
 use neo_granseal::prelude::*;
-use neo_granseal::util::{LineSegment, PathBuilder, raycast, Rectangle};
 use crate::cave_scene::Cave;
 use crate::title_scene::TitleScreen;
 use crate::ui::UiEvent;
@@ -58,14 +56,18 @@ impl NeoGransealEventHandler for SceneHandler {
                     CaveEvent::SetScene(scene) => {self.current = scene;}
                     CaveEvent::Error => {println!("Received a strange event, could not unwrap it."); }
                     CaveEvent::Ui(ui) => {
-                        println!("{:?}",ui);
+                        println!("{ui:?}");
                         match ui {
-                            UiEvent::Click { .. } => {
+                            UiEvent::HoverEnter { .. } => {}
+                            UiEvent::HoverExit { .. } => {}
+                            UiEvent::MousePressed { id,.. }if id == "start".to_owned() => {
+                                core.event(CaveEvent::SetScene(1));
                             }
-                            UiEvent::HoverEnter { .. } => {
+                            UiEvent::MousePressed { id,.. }if id == "exit".to_owned() => {
+                                exit(0);
                             }
-                            UiEvent::HoverExit { .. } => {
-                            }
+                            UiEvent::MouseReleased { .. } => {}
+                            _ => {}
                         }
                     }
                 }
