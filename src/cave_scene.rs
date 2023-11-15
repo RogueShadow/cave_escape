@@ -3,8 +3,9 @@ use std::time::Instant;
 use neo_granseal::mesh::fill_path_fan;
 use neo_granseal::prelude::*;
 use neo_granseal::util::{LineSegment, PathBuilder, raycast};
-use crate::cave::{ CaveEvent, CaveObject, Player, SCREEN, TileType, Ui, UiThing};
+use crate::cave::{ CaveEvent, CaveObject, Player, SCREEN, TileType};
 use crate::TILE_WIDTH;
+use crate::ui::*;
 
 pub struct Cave {
     cam: Camera,
@@ -16,7 +17,7 @@ pub struct Cave {
     font: Font,
     images: HashMap<String,Image>,
     colors: HashMap<&'static str,Ani<Color>>,
-    root: UiThing,
+    ui: UiThing,
 }
 impl Default for Cave {
     fn default() -> Self {
@@ -30,28 +31,13 @@ impl Default for Cave {
             font: Font::new(64f32),
             images: HashMap::new(),
             colors: HashMap::new(),
-            root: UiThing { ui: Ui::Frame {
-                id: "Root Frame".to_string(),
-                position: vec2(32,32),
-                size: vec2(64,128),
-                children: vec![
-                    Ui::Frame {
-                        id: "Sub Frame".to_string(),
-                        position: vec2(8,8),
-                        size: vec2(16,8),
-                        children: vec![],
-                        hover: false,
-                    }
-                ],
-                hover: false,
-            }
-            },
+            ui: UiThing::default(),
         }
     }
 }
 impl NeoGransealEventHandler for Cave {
     fn event(&mut self, core: &mut NGCore, event: Event) {
-        self.root.event(core,&event);
+        self.ui.event(core,&event);
         match event {
             Event::KeyEvent {state,key} => {
                 if state == KeyState::Pressed && key == Key::F1 {
@@ -116,9 +102,12 @@ impl NeoGransealEventHandler for Cave {
                 );
                 g.set_tint(Color::ORANGE);
                 g.draw_mesh(&status,vec2(16,16f32 + status.max_y()));
-                self.root.draw(&mut mb);
                 g.set_tint(Color::WHITE);
+
+
+                self.ui.draw(&mut mb);
                 g.draw_mesh(&mb.build(), Vec2::ZERO);
+
             }
             Event::Update(_) => {
                 let time = core.timer.elapsed().as_secs_f32();
@@ -269,6 +258,20 @@ impl NeoGransealEventHandler for Cave {
                 self.meshes.insert("debug", debug);
                 self.objects = map.objects;
                 self.meshes.insert("light", raycast_for_light(&(self.player.pos + vec2(TILE_WIDTH,TILE_WIDTH) / 2f32),&self.collision));
+                self.ui.build(&Ui::Frame {
+                    name: "Root Frame".to_string(),
+                    position: vec2(100,100),
+                    size: vec2(128,128),
+                    children: vec![
+                        Ui::Label {
+                            name: "Root Label".to_string(),
+                            position: vec2(10,10),
+                            size: vec2(32,32),
+                            text: "Hello World".to_string(),
+                            children: vec![],
+                        }
+                    ],
+                });
             }
             _ => {}
         }

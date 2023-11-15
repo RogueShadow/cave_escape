@@ -7,6 +7,7 @@ use neo_granseal::prelude::*;
 use neo_granseal::util::{LineSegment, PathBuilder, raycast, Rectangle};
 use crate::cave_scene::Cave;
 use crate::title_scene::TitleScreen;
+use crate::ui::UiEvent;
 
 
 pub const TILE_WIDTH: i32 = 28;
