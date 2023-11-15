@@ -58,9 +58,13 @@ impl NeoGransealEventHandler for SceneHandler {
                     CaveEvent::SetScene(scene) => {self.current = scene;}
                     CaveEvent::Error => {println!("Received a strange event, could not unwrap it."); }
                     CaveEvent::Ui(ui) => {
+                        println!("{:?}",ui);
                         match ui {
-                            UiEvent::Click { position, id } => {
-                                println!("Clicked id {} at {:?}",id,position);
+                            UiEvent::Click { .. } => {
+                            }
+                            UiEvent::HoverEnter { .. } => {
+                            }
+                            UiEvent::HoverExit { .. } => {
                             }
                         }
                     }

@@ -2,11 +2,21 @@ use std::any::Any;
 use std::collections::HashMap;
 use neo_granseal::prelude::*;
 use neo_granseal::util::Rectangle;
+use crate::cave::CaveEvent;
 
+#[derive(Debug)]
 pub enum UiEvent {
     Click {
-        position: Vec2,
         id: String,
+        position: Vec2,
+    },
+    HoverEnter {
+        id: String,
+        position: Vec2,
+    },
+    HoverExit {
+        id: String,
+        position: Vec2,
     }
 }
 
@@ -44,27 +54,76 @@ impl UiThing {
         }
     }
     fn match_ui_event(&mut self, id: i32, core: &mut NGCore, event: &Event, offset: Vec2) -> bool {
-        let pos = core.state.mouse.pos;
         let (node,ui_type) = self.id_node.get_mut(&id).unwrap();
         let mut offset = offset;
         match ui_type {
             UiType::Frame => {
-                let frame = node.downcast_mut::<UiFrame>().unwrap();
-                if Rectangle::new2(frame.position + offset,frame.size).contains_point(&pos) {
-                    frame.hover = true;
-                } else {
-                    frame.hover = false;
+                match event {
+                    Event::KeyEvent { .. } => {
+
+                    }
+                    Event::MousePressed { .. } => {
+
+                    }
+                    Event::MouseMoved(x,y) => {
+                        let pos = vec2(*x, *y);
+                        let frame = node.downcast_mut::<UiFrame>().unwrap();
+                        if Rectangle::new2(frame.position + offset,frame.size).contains_point(&pos) {
+                            if !frame.hover {
+                                core.event(CaveEvent::Ui(UiEvent::HoverEnter {
+                                    id: frame.name.to_owned(),
+                                    position: frame.position + offset,
+                                }))
+                            }
+                            frame.hover = true;
+                        } else {
+                            if frame.hover {
+                                core.event(CaveEvent::Ui(UiEvent::HoverExit {
+                                    id: frame.name.to_owned(),
+                                    position: frame.position + offset,
+                                }))
+                            }
+                            frame.hover = false;
+                        }
+                        offset += frame.position;
+
+                    }
+                    _ => {}
                 }
-                offset += frame.position;
             }
             UiType::Label => {
-                let label = node.downcast_mut::<UiLabel>().unwrap();
-                if Rectangle::new2(label.position + offset,label.size).contains_point(&pos) {
-                    label.hover = true;
-                } else {
-                    label.hover = false;
+                match event {
+                    Event::KeyEvent { .. } => {
+
+                    }
+                    Event::MousePressed { .. } => {
+
+                    }
+                    Event::MouseMoved(x,y) => {
+                        let pos = vec2(*x, *y);
+                        let label = node.downcast_mut::<UiLabel>().unwrap();
+                        if Rectangle::new2(label.position + offset,label.size).contains_point(&pos) {
+                            if !label.hover {
+                                core.event(CaveEvent::Ui(UiEvent::HoverEnter {
+                                    id: label.name.to_owned(),
+                                    position: label.position + offset,
+                                }))
+                            }
+                            label.hover = true;
+                        } else {
+                            if label.hover {
+                                core.event(CaveEvent::Ui(UiEvent::HoverExit {
+                                    id: label.name.to_owned(),
+                                    position: label.position + offset,
+                                }))
+                            }
+                            label.hover = false;
+                        }
+                        offset += label.position;
+
+                    }
+                    _ => {}
                 }
-                offset += label.position;
             }
         }
         let children = self.parent_children.get(&id).unwrap().iter().map(|c| c.to_owned()).collect::<Vec<_>>();
@@ -72,21 +131,7 @@ impl UiThing {
         children.iter().for_each(|child|{
             self.match_ui_event(*child,core,event,offset);
         });
-
-        match event {
-            Event::KeyEvent { .. } => {
-                false
-            }
-            Event::MousePressed { .. } => {
-                false
-            }
-            Event::MouseMoved(x,y) => {
-                let pos = vec2(*x, *y);
-
-                false
-            }
-            _ => {false}
-        }
+        false
     }
     pub fn draw(&self, mb: &mut MeshBuilder) {
         if let Some(root) = self.root {
