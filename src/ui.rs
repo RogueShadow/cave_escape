@@ -487,3 +487,63 @@ pub enum Ui {
         size: Option<Vec2>,
     }
 }
+
+pub enum Ui2 {
+    V {
+        ui: Vec<Ui2>,
+    },
+    H {
+        ui: Vec<Ui2>,
+    },
+    Frame {
+        name: String,
+        parent: usize,
+        children: Vec<usize>,
+        position: Vec2,
+        size: Vec2,
+        style: UiFrameStyle,
+    },
+    Label {
+        name: String,
+        parent: usize,
+        children: Vec<usize>,
+        position: Vec2,
+        size: Vec2,
+        style: UiLabelStyle,
+    }
+}
+
+pub struct UiBuilder {
+    ui: Vec<Ui2>,
+}
+impl Default for UiBuilder {
+    fn default() -> Self {
+        Self {
+            ui: vec![
+                Ui2::Frame {
+                    name: "root".to_string(),
+                    parent: 0,
+                    position: Vec2::ZERO,
+                    size: Vec2::ZERO,
+                    children: vec![],
+                    style: Default::default(),
+                }
+            ]
+        }
+    }
+}
+impl UiBuilder {
+    pub fn frame(&mut self,name: &str,position: Vec2) {
+        self.ui.push(Ui2::Frame {
+            name: name.to_string(),
+            parent: 0,
+            children: vec![],
+            position,
+            size: Default::default(),
+            style: Default::default(),
+        })
+    }
+    pub fn label(&mut self, name: &str, text: &str) {
+
+    }
+}

@@ -30,7 +30,7 @@ impl NeoGransealEventHandler for TitleScreen {
                 g.draw_mesh(&mb.build(),Vec2::ZERO);
             }
             Event::Load => {
-                let gran = core.load_image("assets/granseal.png").unwrap();
+                let gran = core.load_image("assets/granseal.png", true).unwrap();
                 let font = Font::default();
                 let exit = font.text("Exit Game",100f32).size() + vec2(8,8);
                 self.ui.build(&Ui::Frame {

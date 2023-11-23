@@ -101,7 +101,7 @@ impl NeoGransealEventHandler for Cave {
                 g.set_tint(Color::WHITE);
 
 
-                g.draw_mesh(&mb.build(), Vec2::ZERO);
+                //g.draw_mesh(&mb.build(), Vec2::ZERO);
 
             }
             Event::Update(_) => {
@@ -232,13 +232,15 @@ impl NeoGransealEventHandler for Cave {
                 mb.solid(Color::BLACK);
                 mb.rect(vec2(8192,8192));
                 let darkness = mb.build();
+                mb.clear_meshes();
                 self.meshes.insert("darkness",darkness);
-                let base = core.create_image(8192,8192);
+                let base = core.create_image(8192,8192, true);
                 self.images.insert("base".to_owned(),base);
                 let map = build_map(include_str!("../assets/map.txt"));
                 self.map = map.tiles;
                 self.meshes.insert("floor",map.floor);
                 self.meshes.insert("walls",map.walls);
+                mb.solid(Color::WHITE);
                 mb.rounded_rect(vec2(TILE_WIDTH,TILE_WIDTH),4f32);
                 self.meshes.insert("player",mb.build());
 
